@@ -70,6 +70,12 @@ public class ArticleListActivity extends ActionBarActivity implements
     }
 
     @Override
+    protected void onPause() {
+        stopService(new Intent(this, UpdaterService.class));
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(mRefreshingReceiver);
