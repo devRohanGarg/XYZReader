@@ -130,7 +130,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         setupToolbar();
         addFabShareAction();
-        bindViews();
+//        bindViews();
         updateStatusBar();
         if (shouldAddScrollViewTranslations) {
             addScrollViewTranslations();

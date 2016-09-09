@@ -25,7 +25,8 @@ public class ItemsDatabase extends SQLiteOpenHelper {
                 + ItemsContract.ItemsColumns.THUMB_URL + " TEXT NOT NULL,"
                 + ItemsContract.ItemsColumns.PHOTO_URL + " TEXT NOT NULL,"
                 + ItemsContract.ItemsColumns.ASPECT_RATIO + " REAL NOT NULL DEFAULT 1.5,"
-                + ItemsContract.ItemsColumns.PUBLISHED_DATE + " INTEGER NOT NULL DEFAULT 0"
+                + ItemsContract.ItemsColumns.PUBLISHED_DATE + " INTEGER NOT NULL DEFAULT 0,"
+                + "UNIQUE(" + ItemsContract.ItemsColumns.SERVER_ID + ") ON CONFLICT IGNORE"
                 + ")");
     }
 
