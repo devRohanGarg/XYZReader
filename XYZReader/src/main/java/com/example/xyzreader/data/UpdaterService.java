@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.RemoteException;
+import android.support.annotation.IntDef;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -18,15 +19,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 public class UpdaterService extends IntentService {
     public static final String BROADCAST_ACTION_STATE_CHANGE
             = "com.example.xyzreader.intent.action.STATE_CHANGE";
+    public static final String ARTICLES_STATUS
+            = "articles_status";
     public static final String EXTRA_REFRESHING
             = "com.example.xyzreader.intent.extra.REFRESHING";
+    public static final int ARTICLES_STATUS_UNKNOWN = 0;
+    public static final int ARTICLES_STATUS_NETWORK_ERROR = 1;
+    public static final int ARTICLES_STATUS_SUCCESS = 2;
+    public static final int ARTICLES_STATUS_SERVER_ERROR = 3;
     private static final String TAG = "UpdaterService";
-
     public UpdaterService() {
         super(TAG);
     }
@@ -39,19 +47,14 @@ public class UpdaterService extends IntentService {
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if (ni == null || !ni.isConnected()) {
             Log.w(TAG, "Not online, not refreshing.");
+            sendStateChangeBroadcast(ARTICLES_STATUS_NETWORK_ERROR, false);
             return;
         }
-
-        sendStickyBroadcast(
-                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, true));
-
+        sendStateChangeBroadcast(ARTICLES_STATUS_SUCCESS, true);
         // Don't even inspect the intent, we only do one thing, and that's fetch content.
         ArrayList<ContentProviderOperation> cpo = new ArrayList<ContentProviderOperation>();
 
         Uri dirUri = ItemsContract.Items.buildDirUri();
-
-        // Delete all items
-        cpo.add(ContentProviderOperation.newDelete(dirUri).build());
 
         try {
             JSONArray array = RemoteEndpointUtil.fetchJsonArray();
@@ -78,9 +81,20 @@ public class UpdaterService extends IntentService {
 
         } catch (JSONException | RemoteException | OperationApplicationException e) {
             Log.e(TAG, "Error updating content.", e);
+            sendStateChangeBroadcast(ARTICLES_STATUS_SERVER_ERROR, false);
         }
+        sendStateChangeBroadcast(ARTICLES_STATUS_SUCCESS, false);
+    }
 
-        sendStickyBroadcast(
-                new Intent(BROADCAST_ACTION_STATE_CHANGE).putExtra(EXTRA_REFRESHING, false));
+    private void sendStateChangeBroadcast(@ArticlesStatus int articlesStatus, boolean refreshState) {
+        Intent actionStateChangeBroadcastIntent = new Intent(BROADCAST_ACTION_STATE_CHANGE);
+        actionStateChangeBroadcastIntent.putExtra(EXTRA_REFRESHING, refreshState);
+        actionStateChangeBroadcastIntent.putExtra(ARTICLES_STATUS, articlesStatus);
+        sendStickyBroadcast(actionStateChangeBroadcastIntent);
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef(value = {ARTICLES_STATUS_UNKNOWN, ARTICLES_STATUS_SUCCESS, ARTICLES_STATUS_SERVER_ERROR, ARTICLES_STATUS_NETWORK_ERROR})
+    public @interface ArticlesStatus {
     }
 }

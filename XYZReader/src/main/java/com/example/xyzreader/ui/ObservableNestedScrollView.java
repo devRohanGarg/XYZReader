@@ -17,20 +17,19 @@
 package com.example.xyzreader.ui;
 
 import android.content.Context;
-import android.os.Parcelable;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.ScrollView;
 
 /**
  * A custom ScrollView that can accept a scroll listener.
  */
-public class ObservableScrollView extends ScrollView {
+public class ObservableNestedScrollView extends NestedScrollView {
     private Callbacks mCallbacks;
 
-    public ObservableScrollView(Context context, AttributeSet attrs) {
+    public ObservableNestedScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
 
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
@@ -48,6 +47,11 @@ public class ObservableScrollView extends ScrollView {
         if (scrollY > 0 && mCallbacks != null) {
             mCallbacks.onScrollChanged();
         }
+    }
+
+    @Override
+    public void fling(int velocityY) {
+        super.fling(velocityY / 100);
     }
 
     @Override
