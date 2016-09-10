@@ -20,7 +20,6 @@ import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
-import com.example.xyzreader.ui.ArticleDetailActivity;
 
 import java.util.concurrent.TimeUnit;
 

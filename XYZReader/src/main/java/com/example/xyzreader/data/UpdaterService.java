@@ -35,6 +35,7 @@ public class UpdaterService extends IntentService {
     public static final int ARTICLES_STATUS_SUCCESS = 2;
     public static final int ARTICLES_STATUS_SERVER_ERROR = 3;
     private static final String TAG = "UpdaterService";
+
     public UpdaterService() {
         super(TAG);
     }

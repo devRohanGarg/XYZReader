@@ -31,10 +31,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-import com.example.xyzreader.ui.ArticleDetailActivity;
-import com.example.xyzreader.ui.ImageLoaderHelper;
-import com.example.xyzreader.ui.ObservableNestedScrollView;
-import com.example.xyzreader.ui.ArticleListActivity;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
