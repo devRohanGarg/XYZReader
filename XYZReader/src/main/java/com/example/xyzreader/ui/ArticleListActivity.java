@@ -8,15 +8,16 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
-import android.util.TypedValue;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -39,6 +40,8 @@ public class ArticleListActivity extends AppCompatActivity implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private boolean mIsRefreshing = false;
+    private boolean mIsConnected = true;
+    private View mRootView;
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -46,6 +49,7 @@ public class ArticleListActivity extends AppCompatActivity implements
             switch (intent.getAction()) {
                 case UpdaterService.BROADCAST_ACTION_STATE_CHANGE:
                     mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
+                    mIsConnected = intent.getBooleanExtra(UpdaterService.EXTRA_IS_CONNECTED, true);
                     updateRefreshingUI();
                     break;
             }
@@ -55,7 +59,8 @@ public class ArticleListActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article_list);
+        mRootView = LayoutInflater.from(this).inflate(R.layout.activity_article_list, (CoordinatorLayout) findViewById(R.id.root));
+        setContentView(mRootView);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -79,6 +84,16 @@ public class ArticleListActivity extends AppCompatActivity implements
         startService(new Intent(this, UpdaterService.class));
     }
 
+    private void showSnackBar(String message) {
+        final Snackbar snackbar = Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
+        snackbar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        }).setActionTextColor(ContextCompat.getColor(getApplicationContext(), R.color.accent)).show();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -99,6 +114,11 @@ public class ArticleListActivity extends AppCompatActivity implements
     }
 
     private void updateRefreshingUI() {
+        if (!mIsConnected) {
+            showSnackBar("Unable to connect to the internet");
+            mSwipeRefreshLayout.setRefreshing(false);
+            return;
+        }
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 
