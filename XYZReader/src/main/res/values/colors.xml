@@ -28,6 +28,9 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
     <color name="scrim">#D32F2F</color>
+
+    <color name="fab_normal">@color/accent</color>
+    <color name="fab_pressed">#F56C00</color>
     <!-- Basic Colors -->
     <color name="transparent">#00000000</color>
     <color name="white">#ffffff</color>
