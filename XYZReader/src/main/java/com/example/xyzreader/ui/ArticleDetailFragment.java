@@ -219,7 +219,9 @@ public class ArticleDetailFragment extends Fragment implements
                             if (bitmap != null) {
                                 Palette p = new Palette.Builder(bitmap).generate();
                                 mMutedColor = p.getDarkMutedColor(0xFF333333);
+                                mPhotoView.setAlpha(0f);
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
+                                mPhotoView.animate().alpha(1f).setDuration(DynamicHeightNetworkImageView.ANIM_DURATION);
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();
