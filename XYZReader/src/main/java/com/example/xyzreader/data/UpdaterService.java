@@ -13,9 +13,6 @@ import android.util.Log;
 
 import com.example.xyzreader.remote.RemoteEndpointUtil;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,8 +34,8 @@ public class UpdaterService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        DateTimeFormatter dateFormatter = ISODateTimeFormat.dateTime();
-        DateTime dateTime;
+        //DateTimeFormatter dateFormatter = ISODateTimeFormat.dateTime();
+        //DateTime dateTime;
 
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -75,8 +72,9 @@ public class UpdaterService extends IntentService {
                 values.put(ItemsContract.Items.THUMB_URL, object.getString("thumb"));
                 values.put(ItemsContract.Items.PHOTO_URL, object.getString("photo"));
                 values.put(ItemsContract.Items.ASPECT_RATIO, object.getString("aspect_ratio"));
-                dateTime = dateFormatter.parseDateTime(object.getString("published_date"));
-                values.put(ItemsContract.Items.PUBLISHED_DATE, dateTime.getMillis());
+                //dateTime = dateFormatter.parseDateTime(object.getString("published_date"));
+                //values.put(ItemsContract.Items.PUBLISHED_DATE, dateTime.getMillis());
+                values.put(ItemsContract.Items.PUBLISHED_DATE, object.getString("published_date"));
                 cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
             }
 
