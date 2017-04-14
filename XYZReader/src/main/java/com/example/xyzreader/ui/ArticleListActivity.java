@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,11 @@ import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 /**
  * An activity representing a list of Articles. This activity has different presentations for
  * handset and tablet-size devices. On handsets, the activity presents a list of items, which when
@@ -36,12 +42,18 @@ import com.example.xyzreader.data.UpdaterService;
 public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String TAG = ArticleListActivity.class.toString();
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private boolean mIsRefreshing = false;
     private boolean mIsConnected = true;
     private View mRootView;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
+    // Use default locale format
+    private SimpleDateFormat outputFormat = new SimpleDateFormat();
+    // Most time functions can only handle 1902 - 2037
+    private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -184,16 +196,29 @@ public class ArticleListActivity extends AppCompatActivity implements
             return vh;
         }
 
+        private Date parsePublishedDate() {
+            try {
+                String date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
+                return dateFormat.parse(date);
+            } catch (ParseException ex) {
+                Log.e(TAG, ex.getMessage());
+                Log.i(TAG, "passing today's date");
+                return new Date();
+            }
+        }
+
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+            Date publishedDate = parsePublishedDate();
+
             String subTitle = DateUtils.getRelativeTimeSpanString(
-                    mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
-                    System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                    publishedDate.getTime(), System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_ALL).toString()
                     + " by "
                     + mCursor.getString(ArticleLoader.Query.AUTHOR);
+
             holder.subtitleView.setText(subTitle);
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
