@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * An activity representing a list of Articles. This activity has different presentations for
@@ -49,9 +50,9 @@ public class ArticleListActivity extends AppCompatActivity implements
     private boolean mIsRefreshing = false;
     private boolean mIsConnected = true;
     private View mRootView;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss", Locale.ENGLISH);
     // Use default locale format
-    private SimpleDateFormat outputFormat = new SimpleDateFormat();
+    //private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
     private BroadcastReceiver mRefreshingReceiver = new BroadcastReceiver() {
